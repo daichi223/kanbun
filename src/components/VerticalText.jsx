@@ -1,6 +1,6 @@
 /**
  * 縦書きテキスト表示コンポーネント
- * Vertical text rendering component with annotations
+ * Vertical text rendering component with annotations (Kaeriten, Ruby, TCY)
  */
 function VerticalText({ block, className = '' }) {
   if (!block) {
@@ -18,34 +18,147 @@ function VerticalText({ block, className = '' }) {
     const { text, annotations } = block;
     if (!text) return null;
 
-    // 位置ごとの返り点マップを作成
+    // 各種アノテーションのマップを作成
     const kaeritenMap = new Map();
+    const rubyMap = new Map();
+    const tcySet = new Set();
+
     annotations.forEach(ann => {
+      // 返り点
       if (ann.type === 'kaeriten' && ann.pos !== undefined) {
         kaeritenMap.set(ann.pos, ann.value);
       }
+
+      // ルビ
+      if (ann.type === 'ruby' && ann.range) {
+        for (let i = ann.range[0]; i < ann.range[1]; i++) {
+          rubyMap.set(i, {
+            isStart: i === ann.range[0],
+            isEnd: i === ann.range[1] - 1,
+            rt: ann.rt,
+            fullRange: ann.range
+          });
+        }
+      }
+
+      // 縦中横
+      if (ann.type === 'tcy' && ann.range) {
+        for (let i = ann.range[0]; i < ann.range[1]; i++) {
+          tcySet.add(i);
+        }
+      }
     });
+
+    // 縦中横のグループを作成
+    const tcyGroups = [];
+    annotations
+      .filter(ann => ann.type === 'tcy' && ann.range)
+      .forEach(ann => {
+        tcyGroups.push({
+          start: ann.range[0],
+          end: ann.range[1],
+          text: text.slice(ann.range[0], ann.range[1])
+        });
+      });
+
+    // ルビのグループを作成
+    const rubyGroups = [];
+    annotations
+      .filter(ann => ann.type === 'ruby' && ann.range)
+      .forEach(ann => {
+        rubyGroups.push({
+          start: ann.range[0],
+          end: ann.range[1],
+          rb: ann.rb,
+          rt: ann.rt
+        });
+      });
 
     // 文字を1つずつ処理
     const chars = Array.from(text);
-    return chars.map((char, idx) => {
+    const elements = [];
+    let skipUntil = -1;
+
+    for (let idx = 0; idx < chars.length; idx++) {
+      // すでに処理済みならスキップ
+      if (idx < skipUntil) continue;
+
+      const char = chars[idx];
+
+      // 縦中横グループに属する場合
+      const tcyGroup = tcyGroups.find(g => idx === g.start);
+      if (tcyGroup) {
+        elements.push(
+          <span
+            key={`tcy-${idx}`}
+            className="inline-block text-2xl"
+            style={{
+              textCombineUpright: 'all',
+              WebkitTextCombineUpright: 'all',
+              backgroundColor: 'rgba(147, 51, 234, 0.1)',
+              padding: '0.1em 0.2em',
+              borderRadius: '2px'
+            }}
+          >
+            {tcyGroup.text}
+          </span>
+        );
+        skipUntil = tcyGroup.end;
+        continue;
+      }
+
+      // ルビグループに属する場合
+      const rubyGroup = rubyGroups.find(g => idx === g.start);
+      if (rubyGroup) {
+        const kaeriten = kaeritenMap.get(rubyGroup.start);
+
+        elements.push(
+          <span key={`ruby-${idx}`} className="relative inline-block">
+            <ruby className="text-3xl">
+              {rubyGroup.rb}
+              <rt className="text-sm text-gray-600">{rubyGroup.rt}</rt>
+            </ruby>
+            {kaeriten && (
+              <span
+                className="absolute text-sm text-red-600 font-bold"
+                style={{
+                  right: '-1.2em',
+                  top: '50%',
+                  transform: 'translateY(-50%)'
+                }}
+              >
+                {kaeriten}
+              </span>
+            )}
+          </span>
+        );
+        skipUntil = rubyGroup.end;
+        continue;
+      }
+
+      // 通常の文字
       const kaeriten = kaeritenMap.get(idx);
 
-      return (
+      elements.push(
         <span key={idx} className="relative inline-block">
           <span className="text-3xl">{char}</span>
           {kaeriten && (
-            <span className="absolute text-sm text-red-600 font-bold" style={{
-              right: '-1.2em',
-              top: '50%',
-              transform: 'translateY(-50%)'
-            }}>
+            <span
+              className="absolute text-sm text-red-600 font-bold"
+              style={{
+                right: '-1.2em',
+                top: '50%',
+                transform: 'translateY(-50%)'
+              }}
+            >
               {kaeriten}
             </span>
           )}
         </span>
       );
-    });
+    }
+
+    return elements;
   };
 
   return (
@@ -89,9 +202,13 @@ function VerticalText({ block, className = '' }) {
           background: #b8935a;
         }
 
-        /* 約物の回転（句読点など） */
-        .vertical-text span:has(+ span::before) {
-          text-combine-upright: all;
+        /* ルビの縦書き対応 */
+        .vertical-text ruby {
+          ruby-position: over;
+        }
+
+        .vertical-text rt {
+          font-size: 0.5em;
         }
       `}</style>
     </div>
