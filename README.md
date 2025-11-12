@@ -24,11 +24,13 @@ KBR Editor（Kanbun Kaeriten Browser Editor）は、漢文教材を効率的に�
 - ✅ ローカルストレージ自動保存
 - ✅ ツールバー＆ステータスバー
 
-### Phase 4 (予定)
-- 📄 PDF出力（Puppeteer）
-- 🌐 Google Docs用HTML出力
+### Phase 4 (完了) ✅
+- ✅ PDF出力（html2canvas + jsPDF）
+- ✅ 高解像度縦書きPDF生成
+- ✅ 複数ページ対応
 
 ### Phase 5 (予定)
+- 🌐 Google Docs用HTML出力
 - 📋 Wordマクロテンプレート（.dotm）
 - 🎨 禁則処理・約物回転
 - ⚙️ カスタム設定
@@ -163,3 +165,4 @@ kanbun/
 | Phase 1 | 2025-11-12 | プロジェクト基盤構築、縦書きエディタ |
 | Phase 2 | 2025-11-12 | UI改善、Word出力機能 |
 | Phase 3 | 2025-11-12 | ルビ・縦中横・ツールバー・ローカルストレージ |
+| Phase 4 | 2025-11-12 | PDF出力機能（高解像度縦書き対応） |
