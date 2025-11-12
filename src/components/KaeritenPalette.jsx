@@ -50,45 +50,42 @@ function KaeritenPalette({ onSelect, currentPosition, document, previewRef }) {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="mb-4">
-        <h2 className="text-xl font-bold mb-2">返り点パレット</h2>
+    <div className="space-y-3">
+      <div className="mb-2">
+        <h2 className="text-lg font-bold mb-1">返り点パレット</h2>
         {currentPosition !== null && (
-          <p className="text-sm text-gray-600">
+          <p className="text-xs text-gray-600">
             選択位置: {currentPosition}
           </p>
         )}
       </div>
 
       {/* ショートカット説明 */}
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <h3 className="text-sm font-semibold mb-2 text-blue-900">
-          キーボードショートカット
-        </h3>
+      <div className="bg-blue-50 p-2 rounded">
         <p className="text-xs text-blue-800">
-          Alt + 数字キーで返り点を追加できます
+          Alt + 数字キーで返り点を追加
         </p>
       </div>
 
       {/* 返り点グループ */}
       {kaeritenGroups.map((group, idx) => (
-        <div key={idx} className="bg-white rounded-lg shadow p-4">
-          <h3 className="text-sm font-semibold mb-3 text-gray-700 border-b pb-2">
+        <div key={idx} className="bg-white rounded shadow p-2">
+          <h3 className="text-xs font-semibold mb-2 text-gray-700 border-b pb-1">
             {group.name}
           </h3>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-1.5">
             {group.items.map((item, itemIdx) => (
               <button
                 key={itemIdx}
                 onClick={() => onSelect(item.value)}
-                className="group relative p-3 bg-gray-50 hover:bg-blue-100 border border-gray-200 hover:border-blue-400 rounded transition-all duration-150"
+                className="group relative p-1.5 bg-gray-50 hover:bg-blue-100 border border-gray-200 hover:border-blue-400 rounded transition-all duration-150"
                 title={item.description}
               >
-                <div className="text-2xl font-bold text-center mb-1">
+                <div className="text-lg font-bold text-center">
                   {item.value}
                 </div>
                 {item.key && (
-                  <div className="text-xs text-gray-500 text-center">
+                  <div className="text-[10px] text-gray-500 text-center leading-tight">
                     {item.key}
                   </div>
                 )}
@@ -99,19 +96,19 @@ function KaeritenPalette({ onSelect, currentPosition, document, previewRef }) {
       ))}
 
       {/* ルビ・縦中横ボタン */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="text-sm font-semibold mb-3 text-gray-700 border-b pb-2">
+      <div className="bg-white rounded shadow p-2">
+        <h3 className="text-xs font-semibold mb-2 text-gray-700 border-b pb-1">
           その他の機能
         </h3>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <button
-            className="w-full p-3 bg-gray-50 hover:bg-green-100 border border-gray-200 hover:border-green-400 rounded transition-all duration-150 text-sm font-medium"
+            className="w-full p-2 bg-gray-50 hover:bg-green-100 border border-gray-200 hover:border-green-400 rounded transition-all duration-150 text-xs font-medium"
             onClick={() => alert('ルビ機能は次のフェーズで実装予定')}
           >
             📝 ルビを追加 (Alt+0)
           </button>
           <button
-            className="w-full p-3 bg-gray-50 hover:bg-purple-100 border border-gray-200 hover:border-purple-400 rounded transition-all duration-150 text-sm font-medium"
+            className="w-full p-2 bg-gray-50 hover:bg-purple-100 border border-gray-200 hover:border-purple-400 rounded transition-all duration-150 text-xs font-medium"
             onClick={() => alert('縦中横機能は次のフェーズで実装予定')}
           >
             🔢 縦中横
@@ -120,13 +117,13 @@ function KaeritenPalette({ onSelect, currentPosition, document, previewRef }) {
       </div>
 
       {/* エクスポートボタン */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="text-sm font-semibold mb-3 text-gray-700 border-b pb-2">
+      <div className="bg-white rounded shadow p-2">
+        <h3 className="text-xs font-semibold mb-2 text-gray-700 border-b pb-1">
           エクスポート
         </h3>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <button
-            className="w-full p-3 bg-red-500 hover:bg-red-600 text-white rounded transition-all duration-150 text-sm font-medium"
+            className="w-full p-2 bg-red-500 hover:bg-red-600 text-white rounded transition-all duration-150 text-xs font-medium"
             onClick={async () => {
               if (!document) {
                 alert('ドキュメントが見つかりません');
@@ -153,7 +150,7 @@ function KaeritenPalette({ onSelect, currentPosition, document, previewRef }) {
             📄 PDF出力
           </button>
           <button
-            className="w-full p-3 bg-blue-500 hover:bg-blue-600 text-white rounded transition-all duration-150 text-sm font-medium"
+            className="w-full p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition-all duration-150 text-xs font-medium"
             onClick={async () => {
               if (!document) {
                 alert('ドキュメントが見つかりません');
@@ -171,7 +168,7 @@ function KaeritenPalette({ onSelect, currentPosition, document, previewRef }) {
             📝 Word出力
           </button>
           <button
-            className="w-full p-3 bg-green-500 hover:bg-green-600 text-white rounded transition-all duration-150 text-sm font-medium text-xs"
+            className="w-full p-2 bg-green-500 hover:bg-green-600 text-white rounded transition-all duration-150 text-xs font-medium"
             onClick={() => {
               if (!document) {
                 alert('ドキュメントが見つかりません');
