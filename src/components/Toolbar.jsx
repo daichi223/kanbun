@@ -91,9 +91,8 @@ function Toolbar({ document, onSave, onLoad, onNew, onExportWord, onExportPdf })
           {/* PDF出力 */}
           <button
             onClick={onExportPdf}
-            disabled
-            className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
-            title="PDF出力（実装予定）"
+            className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded transition"
+            title="PDF出力"
           >
             📄 PDF
           </button>

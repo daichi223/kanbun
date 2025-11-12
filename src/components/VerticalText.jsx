@@ -1,8 +1,10 @@
+import { forwardRef } from 'react';
+
 /**
  * 縦書きテキスト表示コンポーネント
  * Vertical text rendering component with annotations (Kaeriten, Ruby, TCY)
  */
-function VerticalText({ block, className = '' }) {
+const VerticalText = forwardRef(({ block, className = '' }, ref) => {
   if (!block) {
     return (
       <div className={`text-center text-gray-400 ${className}`}>
@@ -164,6 +166,7 @@ function VerticalText({ block, className = '' }) {
   return (
     <div className={`vertical-text-container ${className}`}>
       <div
+        ref={ref}
         className="vertical-text bg-amber-50 p-8 rounded-lg shadow-inner inline-block max-h-[80vh] overflow-auto"
         style={{
           writingMode: 'vertical-rl',
@@ -213,6 +216,8 @@ function VerticalText({ block, className = '' }) {
       `}</style>
     </div>
   );
-}
+});
+
+VerticalText.displayName = 'VerticalText';
 
 export default VerticalText;

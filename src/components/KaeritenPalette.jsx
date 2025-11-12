@@ -1,11 +1,12 @@
 import { KAERITEN_TYPES } from '../models/kanbunSchema';
 import { exportToWord, exportForMacro } from '../services/wordExport';
+import { exportToPdf } from '../services/pdfExport';
 
 /**
  * 返り点パレットコンポーネント
  * Kaeriten (return marks) selection palette
  */
-function KaeritenPalette({ onSelect, currentPosition, document }) {
+function KaeritenPalette({ onSelect, currentPosition, document, previewRef }) {
   const kaeritenGroups = [
     {
       name: '基本',
@@ -125,9 +126,29 @@ function KaeritenPalette({ onSelect, currentPosition, document }) {
         </h3>
         <div className="space-y-2">
           <button
-            className="w-full p-3 bg-red-500 hover:bg-red-600 text-white rounded transition-all duration-150 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => alert('PDF出力は次のフェーズで実装予定')}
-            disabled
+            className="w-full p-3 bg-red-500 hover:bg-red-600 text-white rounded transition-all duration-150 text-sm font-medium"
+            onClick={async () => {
+              if (!document) {
+                alert('ドキュメントが見つかりません');
+                return;
+              }
+
+              if (!previewRef?.current) {
+                alert('プレビュー要素が見つかりません');
+                return;
+              }
+
+              try {
+                const result = await exportToPdf(document, previewRef.current);
+                if (result.success) {
+                  alert(`✅ PDF出力成功！\nファイル名: ${result.filename}`);
+                } else {
+                  alert(`❌ PDF出力失敗\nエラー: ${result.error}`);
+                }
+              } catch (error) {
+                alert(`❌ PDF出力エラー\n${error.message}`);
+              }
+            }}
           >
             📄 PDF出力
           </button>

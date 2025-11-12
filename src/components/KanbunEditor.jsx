@@ -8,6 +8,7 @@ import RubyDialog from './RubyDialog';
 import TcyButton from './TcyButton';
 import { useLocalStorage, useAutoSave, getStorageInfo } from '../hooks/useLocalStorage';
 import { exportToWord } from '../services/wordExport';
+import { exportToPdf } from '../services/pdfExport';
 
 /**
  * 漢文エディタのメインコンポーネント
@@ -21,6 +22,7 @@ function KanbunEditor() {
   const [showRubyDialog, setShowRubyDialog] = useState(false);
   const [storageInfo, setStorageInfo] = useState(null);
   const editorRef = useRef(null);
+  const previewRef = useRef(null);
 
   // 自動保存（2秒ディレイ）
   useAutoSave('kanbun_autosave', document, 2000);
@@ -227,6 +229,27 @@ function KanbunEditor() {
   };
 
   /**
+   * PDF出力ハンドラ
+   */
+  const handleExportPdf = async () => {
+    if (!previewRef.current) {
+      alert('❌ プレビュー要素が見つかりません');
+      return;
+    }
+
+    try {
+      const result = await exportToPdf(document, previewRef.current);
+      if (result.success) {
+        alert(`✅ PDF出力成功！\nファイル名: ${result.filename}`);
+      } else {
+        alert(`❌ PDF出力失敗\nエラー: ${result.error}`);
+      }
+    } catch (error) {
+      alert(`❌ PDF出力エラー\n${error.message}`);
+    }
+  };
+
+  /**
    * キーボードショートカット処理
    */
   useEffect(() => {
@@ -287,7 +310,7 @@ function KanbunEditor() {
         onLoad={handleLoad}
         onNew={handleNew}
         onExportWord={handleExportWord}
-        onExportPdf={() => alert('PDF出力は次のフェーズで実装予定')}
+        onExportPdf={handleExportPdf}
       />
 
       {/* メインコンテンツ */}
@@ -326,6 +349,7 @@ function KanbunEditor() {
             onSelect={handleAddKaeriten}
             currentPosition={cursorPosition}
             document={document}
+            previewRef={previewRef}
           />
 
           <TcyButton
@@ -366,6 +390,7 @@ function KanbunEditor() {
             <h2 className="text-xl font-bold mb-2">プレビュー（縦書き）</h2>
           </div>
           <VerticalText
+            ref={previewRef}
             block={currentBlock}
             className="mx-auto"
           />
