@@ -14,6 +14,41 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
   }
 
   /**
+   * 返り点を描画（単一または多段）
+   */
+  const renderKaeriten = (kaeritenValue, hasRuby = false) => {
+    if (!kaeritenValue) return null;
+
+    // 配列の場合は多段返り点
+    const marks = Array.isArray(kaeritenValue) ? kaeritenValue : [kaeritenValue];
+
+    return marks.map((mark, idx) => {
+      // 多段返り点の場合、右方向にずらす
+      const horizontalOffset = hasRuby ? -1.5 : -0.34;
+      const stackOffset = idx * -0.36; // 多段の場合、さらに右にずらす
+
+      return (
+        <span
+          key={`kaeri-${idx}`}
+          className="kaeriten-mark"
+          style={{
+            position: 'absolute',
+            insetInlineStart: `${horizontalOffset + stackOffset}em`,
+            insetBlockStart: '0.35em', // 文字中央よりやや上
+            fontSize: '0.45em',
+            color: '#dc2626',
+            fontWeight: 'bold',
+            lineHeight: 1,
+            pointerEvents: 'none'
+          }}
+        >
+          {mark}
+        </span>
+      );
+    });
+  };
+
+  /**
    * テキストをアノテーション付きで分割
    */
   const renderText = () => {
@@ -90,19 +125,24 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
       // 縦中横グループに属する場合
       const tcyGroup = tcyGroups.find(g => idx === g.start);
       if (tcyGroup) {
+        const kaeriten = kaeritenMap.get(idx);
+
         elements.push(
-          <span
-            key={`tcy-${idx}`}
-            className="inline-block text-2xl"
-            style={{
-              textCombineUpright: 'all',
-              WebkitTextCombineUpright: 'all',
-              backgroundColor: 'rgba(147, 51, 234, 0.1)',
-              padding: '0.1em 0.2em',
-              borderRadius: '2px'
-            }}
-          >
-            {tcyGroup.text}
+          <span key={`tcy-${idx}`} className="char-container">
+            <span
+              className="tcy-text"
+              style={{
+                display: 'inline-block',
+                textCombineUpright: 'all',
+                WebkitTextCombineUpright: 'all',
+                backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                padding: '0.1em 0.2em',
+                borderRadius: '2px'
+              }}
+            >
+              {tcyGroup.text}
+            </span>
+            {renderKaeriten(kaeriten, false)}
           </span>
         );
         skipUntil = tcyGroup.end;
@@ -115,23 +155,12 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
         const kaeriten = kaeritenMap.get(rubyGroup.start);
 
         elements.push(
-          <span key={`ruby-${idx}`} className="relative inline-block">
-            <ruby className="text-3xl">
+          <span key={`ruby-${idx}`} className="char-container">
+            <ruby className="ruby-text">
               {rubyGroup.rb}
-              <rt className="text-sm text-gray-600">{rubyGroup.rt}</rt>
+              <rt className="ruby-rt">{rubyGroup.rt}</rt>
             </ruby>
-            {kaeriten && (
-              <span
-                className="absolute text-sm text-red-600 font-bold"
-                style={{
-                  right: '-1.2em',
-                  top: '50%',
-                  transform: 'translateY(-50%)'
-                }}
-              >
-                {kaeriten}
-              </span>
-            )}
+            {renderKaeriten(kaeriten, true)}
           </span>
         );
         skipUntil = rubyGroup.end;
@@ -142,20 +171,9 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
       const kaeriten = kaeritenMap.get(idx);
 
       elements.push(
-        <span key={idx} className="relative inline-block">
-          <span className="text-3xl">{char}</span>
-          {kaeriten && (
-            <span
-              className="absolute text-sm text-red-600 font-bold"
-              style={{
-                right: '-1.2em',
-                top: '50%',
-                transform: 'translateY(-50%)'
-              }}
-            >
-              {kaeriten}
-            </span>
-          )}
+        <span key={idx} className="char-container">
+          <span className="base-char">{char}</span>
+          {renderKaeriten(kaeriten, false)}
         </span>
       );
     }
@@ -205,13 +223,40 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
           background: #b8935a;
         }
 
-        /* ルビの縦書き対応 */
-        .vertical-text ruby {
-          ruby-position: over;
+        /* 文字コンテナ - 返り点の位置基準 */
+        .char-container {
+          position: relative;
+          display: inline-block;
         }
 
-        .vertical-text rt {
+        /* 基本文字 */
+        .base-char {
+          font-size: 1em;
+          display: inline-block;
+        }
+
+        /* ルビの縦書き対応 */
+        .vertical-text ruby,
+        .ruby-text {
+          ruby-position: over;
+          font-size: 1em;
+        }
+
+        .vertical-text rt,
+        .ruby-rt {
           font-size: 0.5em;
+          color: #6b7280;
+        }
+
+        /* 縦中横 */
+        .tcy-text {
+          font-size: 0.75em;
+        }
+
+        /* 返り点マーク */
+        .kaeriten-mark {
+          white-space: nowrap;
+          user-select: none;
         }
       `}</style>
     </div>
