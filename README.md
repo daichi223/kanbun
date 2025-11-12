@@ -13,20 +13,26 @@ KBR Editor（Kanbun Kaeriten Browser Editor）は、漢文教材を効率的に�
 - ✅ リアルタイムプレビュー
 - ✅ JSON構造でのデータ保存
 
-### Phase 2 (予定)
+### Phase 2 (完了) ✅
+- ✅ UI改善（レイアウト変更）
+- ✅ Word出力機能（.docx）
+- ✅ マクロ用テキスト出力
+
+### Phase 3 (予定)
 - 📝 ルビ（振り仮名）対応
 - 🔢 縦中横対応
 - 💾 ローカルストレージ保存
-
-### Phase 3 (予定)
-- 📄 PDF出力（Puppeteer）
-- 📝 Word出力（.docx）
-- 🌐 Google Docs用HTML出力
+- 🎨 ツールバー追加
 
 ### Phase 4 (予定)
+- 📄 PDF出力（Puppeteer）
+- 🌐 Google Docs用HTML出力
+
+### Phase 5 (予定)
 - 📋 Wordマクロテンプレート（.dotm）
 - 🎨 禁則処理・約物回転
 - ⚙️ カスタム設定
+- 🤖 AI支援機能
 
 ## 🚀 使い方
 
@@ -150,4 +156,9 @@ kanbun/
 
 ---
 
-**Phase 1 完了日**: 2025年11月12日
+## 📅 開発履歴
+
+| Phase | 完了日 | 主な機能 |
+|-------|--------|----------|
+| Phase 1 | 2025-11-12 | プロジェクト基盤構築、縦書きエディタ |
+| Phase 2 | 2025-11-12 | UI改善、Word出力機能 |
