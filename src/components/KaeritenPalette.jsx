@@ -1,10 +1,11 @@
 import { KAERITEN_TYPES } from '../models/kanbunSchema';
+import { exportToWord, exportForMacro } from '../services/wordExport';
 
 /**
  * 返り点パレットコンポーネント
  * Kaeriten (return marks) selection palette
  */
-function KaeritenPalette({ onSelect, currentPosition }) {
+function KaeritenPalette({ onSelect, currentPosition, document }) {
   const kaeritenGroups = [
     {
       name: '基本',
@@ -124,16 +125,45 @@ function KaeritenPalette({ onSelect, currentPosition }) {
         </h3>
         <div className="space-y-2">
           <button
-            className="w-full p-3 bg-red-500 hover:bg-red-600 text-white rounded transition-all duration-150 text-sm font-medium"
+            className="w-full p-3 bg-red-500 hover:bg-red-600 text-white rounded transition-all duration-150 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => alert('PDF出力は次のフェーズで実装予定')}
+            disabled
           >
             📄 PDF出力
           </button>
           <button
             className="w-full p-3 bg-blue-500 hover:bg-blue-600 text-white rounded transition-all duration-150 text-sm font-medium"
-            onClick={() => alert('Word出力は次のフェーズで実装予定')}
+            onClick={async () => {
+              if (!document) {
+                alert('ドキュメントが見つかりません');
+                return;
+              }
+
+              const result = await exportToWord(document);
+              if (result.success) {
+                alert(`✅ Word出力成功！\nファイル名: ${result.filename}`);
+              } else {
+                alert(`❌ Word出力失敗\nエラー: ${result.error}`);
+              }
+            }}
           >
             📝 Word出力
+          </button>
+          <button
+            className="w-full p-3 bg-green-500 hover:bg-green-600 text-white rounded transition-all duration-150 text-sm font-medium text-xs"
+            onClick={() => {
+              if (!document) {
+                alert('ドキュメントが見つかりません');
+                return;
+              }
+
+              const result = exportForMacro(document);
+              if (result.success) {
+                alert(`✅ マクロ用テキスト出力成功！\nファイル名: ${result.filename}`);
+              }
+            }}
+          >
+            🔧 マクロ用テキスト
           </button>
         </div>
       </div>

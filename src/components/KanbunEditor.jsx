@@ -141,22 +141,23 @@ function KanbunEditor() {
         </div>
       </div>
 
-      {/* 中央：縦書きプレビュー */}
-      <div className="flex-1 bg-white border-l border-r border-gray-200 p-6 overflow-auto">
+      {/* 中央：返り点パレット */}
+      <div className="w-80 bg-gray-100 border-l border-gray-200 p-6 overflow-auto">
+        <KaeritenPalette
+          onSelect={handleAddKaeriten}
+          currentPosition={cursorPosition}
+          document={document}
+        />
+      </div>
+
+      {/* 右側：縦書きプレビュー */}
+      <div className="flex-1 bg-white border-l border-gray-200 p-6 overflow-auto">
         <div className="mb-4">
           <h2 className="text-xl font-bold mb-2">プレビュー（縦書き）</h2>
         </div>
         <VerticalText
           block={currentBlock}
           className="mx-auto"
-        />
-      </div>
-
-      {/* 右側：返り点パレット */}
-      <div className="w-80 bg-gray-100 p-6 overflow-auto">
-        <KaeritenPalette
-          onSelect={handleAddKaeriten}
-          currentPosition={cursorPosition}
         />
       </div>
     </div>
