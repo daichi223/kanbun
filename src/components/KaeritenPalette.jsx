@@ -69,26 +69,21 @@ function KaeritenPalette({ onSelect, currentPosition, document, previewRef }) {
 
       {/* 返り点グループ */}
       {kaeritenGroups.map((group, idx) => (
-        <div key={idx} className="bg-white rounded shadow p-2">
-          <h3 className="text-xs font-semibold mb-2 text-gray-700 border-b pb-1">
+        <div key={idx} className="bg-white rounded shadow p-1.5">
+          <h3 className="text-[10px] font-semibold mb-1 text-gray-700 border-b pb-0.5">
             {group.name}
           </h3>
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-4 gap-1">
             {group.items.map((item, itemIdx) => (
               <button
                 key={itemIdx}
                 onClick={() => onSelect(item.value)}
-                className="group relative p-1.5 bg-gray-50 hover:bg-blue-100 border border-gray-200 hover:border-blue-400 rounded transition-all duration-150"
-                title={item.description}
+                className="group relative p-0.5 bg-gray-50 hover:bg-blue-100 border border-gray-200 hover:border-blue-400 rounded transition-all duration-150"
+                title={`${item.description} ${item.key || ''}`}
               >
-                <div className="text-lg font-bold text-center">
+                <div className="text-sm font-bold text-center leading-tight">
                   {item.value}
                 </div>
-                {item.key && (
-                  <div className="text-[10px] text-gray-500 text-center leading-tight">
-                    {item.key}
-                  </div>
-                )}
               </button>
             ))}
           </div>

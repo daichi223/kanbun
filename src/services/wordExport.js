@@ -8,7 +8,6 @@ import {
   Packer,
   Paragraph,
   TextRun,
-  VerticalAlign,
   PageOrientation,
   AlignmentType,
   HeadingLevel
@@ -131,6 +130,7 @@ export async function exportToWord(kanbunDoc) {
 
 /**
  * ブロックから段落を生成
+ * 返り点は {KAI:} トークン形式で埋め込み、マクロで後処理
  * @param {Object} block - TextBlock
  * @param {Object} meta - DocumentMeta
  * @returns {Array<Paragraph>}
@@ -146,43 +146,38 @@ function createBlockParagraphs(block, meta) {
     .filter(ann => ann.type === 'kaeriten')
     .forEach(ann => {
       if (ann.pos !== undefined) {
-        kaeritenMap.set(ann.pos, ann.value);
+        // 配列の場合は複数の返り点
+        const marks = Array.isArray(ann.value) ? ann.value : [ann.value];
+        kaeritenMap.set(ann.pos, marks);
       }
     });
 
-  // テキストを1文字ずつ処理
+  // テキストを1文字ずつ処理してトークン形式に変換
   const chars = Array.from(text);
-  const textRuns = [];
+  let textContent = '';
 
   chars.forEach((char, idx) => {
-    // 基本文字
-    textRuns.push(
-      new TextRun({
-        text: char,
-        font: meta.font || '游明朝',
-        size: 24 // 12pt
-      })
-    );
+    textContent += char;
 
-    // 返り点があれば追加
-    const kaeriten = kaeritenMap.get(idx);
-    if (kaeriten) {
-      textRuns.push(
-        new TextRun({
-          text: kaeriten,
-          font: meta.font || '游明朝',
-          size: 16, // 8pt (小さく)
-          verticalAlign: VerticalAlign.SUBSCRIPT,
-          color: 'FF0000' // 赤色
-        })
-      );
+    // 返り点があれば {KAI:} トークンとして追加
+    const kaeritenMarks = kaeritenMap.get(idx);
+    if (kaeritenMarks) {
+      kaeritenMarks.forEach(mark => {
+        textContent += `{KAI:${mark}}`;
+      });
     }
   });
 
-  // 段落として返す
+  // 1つのTextRunとして段落に含める
   return [
     new Paragraph({
-      children: textRuns,
+      children: [
+        new TextRun({
+          text: textContent,
+          font: meta.font || '游明朝',
+          size: 24 // 12pt
+        })
+      ],
       spacing: {
         after: 200 // 段落後の間隔
       }
@@ -211,7 +206,9 @@ export function exportToWordTokenFormat(kanbunDoc) {
       .filter(ann => ann.type === 'kaeriten')
       .forEach(ann => {
         if (ann.pos !== undefined) {
-          kaeritenMap.set(ann.pos, ann.value);
+          // 配列の場合は複数の返り点
+          const marks = Array.isArray(ann.value) ? ann.value : [ann.value];
+          kaeritenMap.set(ann.pos, marks);
         }
       });
 
@@ -221,9 +218,11 @@ export function exportToWordTokenFormat(kanbunDoc) {
     chars.forEach((char, idx) => {
       output += char;
 
-      const kaeriten = kaeritenMap.get(idx);
-      if (kaeriten) {
-        output += `{KAI:${kaeriten}}`;
+      const kaeritenMarks = kaeritenMap.get(idx);
+      if (kaeritenMarks) {
+        kaeritenMarks.forEach(mark => {
+          output += `{KAI:${mark}}`;
+        });
       }
     });
 

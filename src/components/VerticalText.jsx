@@ -4,7 +4,7 @@ import { forwardRef } from 'react';
  * 縦書きテキスト表示コンポーネント
  * Vertical text rendering component with annotations (Kaeriten, Ruby, TCY)
  */
-const VerticalText = forwardRef(({ block, className = '' }, ref) => {
+const VerticalText = forwardRef(({ block, className = '', onCharClick }, ref) => {
   if (!block) {
     return (
       <div className={`text-center text-gray-400 ${className}`}>
@@ -15,6 +15,7 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
 
   /**
    * 返り点を描画（単一または多段）
+   * 縦書きにおいて左下に配置
    */
   const renderKaeriten = (kaeritenValue, hasRuby = false) => {
     if (!kaeritenValue) return null;
@@ -23,9 +24,10 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
     const marks = Array.isArray(kaeritenValue) ? kaeritenValue : [kaeritenValue];
 
     return marks.map((mark, idx) => {
-      // 多段返り点の場合、右方向にずらす
-      const horizontalOffset = hasRuby ? -1.5 : -0.34;
-      const stackOffset = idx * -0.36; // 多段の場合、さらに右にずらす
+      // 左方向の基本オフセット（ルビがある場合はさらに左へ）
+      const baseLeft = hasRuby ? -0.50 : -0.40;
+      // 多段の場合、各段を少し左にずらす
+      const stackOffset = idx * -0.10;
 
       return (
         <span
@@ -33,9 +35,9 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
           className="kaeriten-mark"
           style={{
             position: 'absolute',
-            insetInlineStart: `${horizontalOffset + stackOffset}em`,
-            insetBlockStart: '0.35em', // 文字中央よりやや上
-            fontSize: '0.45em',
+            left: `${baseLeft + stackOffset}em`,  // 左側へ配置
+            bottom: '-0.30em',  // 下側へ配置
+            fontSize: '0.6em',  // 60%サイズ
             color: '#dc2626',
             fontWeight: 'bold',
             lineHeight: 1,
@@ -126,9 +128,15 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
       const tcyGroup = tcyGroups.find(g => idx === g.start);
       if (tcyGroup) {
         const kaeriten = kaeritenMap.get(idx);
+        const hasKaeriten = Boolean(kaeriten);
 
         elements.push(
-          <span key={`tcy-${idx}`} className="char-container">
+          <span
+            key={`tcy-${idx}`}
+            className={`char-container ${hasKaeriten ? 'has-kaeriten' : ''} clickable`}
+            onClick={() => onCharClick?.(idx)}
+            title={`位置: ${idx}`}
+          >
             <span
               className="tcy-text"
               style={{
@@ -153,9 +161,15 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
       const rubyGroup = rubyGroups.find(g => idx === g.start);
       if (rubyGroup) {
         const kaeriten = kaeritenMap.get(rubyGroup.start);
+        const hasKaeriten = Boolean(kaeriten);
 
         elements.push(
-          <span key={`ruby-${idx}`} className="char-container">
+          <span
+            key={`ruby-${idx}`}
+            className={`char-container ${hasKaeriten ? 'has-kaeriten' : ''} clickable`}
+            onClick={() => onCharClick?.(rubyGroup.start)}
+            title={`位置: ${rubyGroup.start}`}
+          >
             <ruby className="ruby-text">
               {rubyGroup.rb}
               <rt className="ruby-rt">{rubyGroup.rt}</rt>
@@ -169,9 +183,15 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
 
       // 通常の文字
       const kaeriten = kaeritenMap.get(idx);
+      const hasKaeriten = Boolean(kaeriten);
 
       elements.push(
-        <span key={idx} className="char-container">
+        <span
+          key={idx}
+          className={`char-container ${hasKaeriten ? 'has-kaeriten' : ''} clickable`}
+          onClick={() => onCharClick?.(idx)}
+          title={`位置: ${idx}`}
+        >
           <span className="base-char">{char}</span>
           {renderKaeriten(kaeriten, false)}
         </span>
@@ -185,7 +205,7 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
     <div className={`vertical-text-container ${className}`}>
       <div
         ref={ref}
-        className="vertical-text bg-amber-50 p-8 rounded-lg shadow-inner inline-block max-h-[80vh] overflow-auto"
+        className="vertical-text bg-white p-8 inline-block max-h-[80vh] overflow-auto"
         style={{
           writingMode: 'vertical-rl',
           textOrientation: 'upright',
@@ -227,6 +247,24 @@ const VerticalText = forwardRef(({ block, className = '' }, ref) => {
         .char-container {
           position: relative;
           display: inline-block;
+        }
+
+        /* クリック可能な文字 */
+        .char-container.clickable {
+          cursor: pointer;
+          transition: background-color 0.2s;
+        }
+
+        .char-container.clickable:hover {
+          background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        /* 返り点が付いている文字をハイライト */
+        .char-container.has-kaeriten {
+          background-color: rgba(220, 38, 38, 0.08);
+          border-radius: 2px;
+          padding: 0.05em 0.15em;
+          margin: -0.05em -0.15em;
         }
 
         /* 基本文字 */

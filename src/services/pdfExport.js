@@ -36,7 +36,7 @@ export async function exportToPdf(kanbunDoc, previewElement) {
       scale: 3, // 高解像度
       useCORS: true,
       allowTaint: false,
-      backgroundColor: '#fef3e2', // 和紙風背景色
+      backgroundColor: '#ffffff', // 白紙
       logging: false
     });
 
@@ -111,7 +111,7 @@ export async function exportToPdfMultiPage(kanbunDoc, previewElement) {
       scale: 3,
       useCORS: true,
       allowTaint: false,
-      backgroundColor: '#fef3e2',
+      backgroundColor: '#ffffff',
       logging: false
     });
 
@@ -210,7 +210,7 @@ export async function generatePdfPreview(kanbunDoc, previewElement) {
       scale: 2,
       useCORS: true,
       allowTaint: false,
-      backgroundColor: '#fef3e2',
+      backgroundColor: '#ffffff',
       logging: false
     });
 

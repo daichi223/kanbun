@@ -393,6 +393,7 @@ function KanbunEditor() {
             ref={previewRef}
             block={currentBlock}
             className="mx-auto"
+            onCharClick={(position) => setCursorPosition(position)}
           />
         </div>
       </div>
